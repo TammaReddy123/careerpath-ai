@@ -20,19 +20,39 @@ const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
   : ["http://localhost:5173", "http://localhost:3000"];
 
+// Log CORS configuration for debugging
+console.log("🌐 CORS Configuration:");
+console.log("   Allowed Origins:", allowedOrigins);
+console.log("   NODE_ENV:", process.env.NODE_ENV);
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, Postman, etc.)
-      if (!origin) return callback(null, true);
+      if (!origin) {
+        console.log("⚠️ Request with no origin - allowing");
+        return callback(null, true);
+      }
       
-      if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      // Log origin for debugging
+      console.log(`🔍 CORS check - Origin: ${origin}`);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        console.log(`✅ Origin allowed: ${origin}`);
+        callback(null, true);
+      } else if (process.env.NODE_ENV !== 'production') {
+        // In development, allow all origins
+        console.log(`✅ Development mode - allowing origin: ${origin}`);
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        console.log(`❌ Origin blocked: ${origin}`);
+        console.log(`   Allowed origins: ${allowedOrigins.join(', ')}`);
+        callback(new Error(`Not allowed by CORS. Origin: ${origin}. Allowed: ${allowedOrigins.join(', ')}`));
       }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
