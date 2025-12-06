@@ -109,10 +109,12 @@ export default function Register() {
         // Request was made but no response received
         const isProduction = import.meta.env.PROD;
         if (isProduction) {
-          if (!api.isConfigured) {
-            errorMsg = "Backend URL not configured. Please contact support or check deployment settings.";
+          if (!api.isConfigured || !api.baseUrl) {
+            errorMsg = "⚠️ Backend not configured. The VITE_API_BASE_URL environment variable is missing. Please set it in your deployment platform (Vercel/Netlify) to your Render backend URL (e.g., https://your-backend.onrender.com) and redeploy.";
           } else {
-            errorMsg = "Cannot connect to server. Please check your internet connection or try again later.";
+            // Check if it's a CORS or network error
+            const attemptedUrl = api.baseUrl + '/api/auth/register';
+            errorMsg = `Cannot connect to backend server at ${api.baseUrl}. Please check: 1) Backend is running on Render, 2) CORS is configured correctly, 3) Your internet connection.`;
           }
         } else {
           errorMsg = "Cannot connect to server. Please make sure the backend is running on port 5000.";
@@ -254,12 +256,28 @@ export default function Register() {
         </button>
 
         {msg && (
-          <div className={`mt-4 p-3 rounded-lg text-center ${
+          <div className={`mt-4 p-4 rounded-lg ${
             isError 
-              ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400' 
-              : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
+              ? 'bg-[#4A1E1E] border border-[#7F1D1D] text-[#F87171]' 
+              : 'bg-[#1E3A2E] border border-[#10B981] text-[#10B981]'
           }`}>
-            {msg}
+            <div className="flex items-start gap-2">
+              {isError && <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />}
+              <div className="flex-1">
+                <p className="text-sm font-medium">{msg}</p>
+                {isError && import.meta.env.PROD && (!api.isConfigured || !api.baseUrl) && (
+                  <div className="mt-3 pt-3 border-t border-[#7F1D1D]">
+                    <p className="text-xs text-[#FCA5A5] mb-2">Quick Fix:</p>
+                    <ol className="text-xs text-[#FCA5A5] list-decimal list-inside space-y-1">
+                      <li>Go to Vercel/Netlify dashboard</li>
+                      <li>Settings → Environment Variables</li>
+                      <li>Add: <code className="bg-[#1F2937] px-1 rounded">VITE_API_BASE_URL</code> = your Render backend URL</li>
+                      <li>Redeploy your frontend</li>
+                    </ol>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
