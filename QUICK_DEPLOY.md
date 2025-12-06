@@ -39,12 +39,15 @@ git push -u origin main
    - Framework: Vite
    - Build: `npm run build`
    - Output: `dist`
-4. **Environment Variable**:
-   ```
-   VITE_API_BASE_URL=https://careerpath-backend.onrender.com
-   ```
-   (Use the URL from step 2)
+4. **⚠️ CRITICAL: Environment Variable** (MUST SET THIS!):
+   - Go to **Settings** → **Environment Variables**
+   - Add: `VITE_API_BASE_URL` = `https://careerpath-backend.onrender.com`
+   - **Use the exact backend URL from step 2** (e.g., `https://your-backend-name.onrender.com`)
+   - Select all environments: Production, Preview, Development
+   - **Save** → **Redeploy** (this is required!)
 5. **Deploy** → Copy frontend URL (e.g., `https://careerpath-ai.vercel.app`)
+
+**⚠️ IMPORTANT**: If you see "Cannot connect to server" errors, it means `VITE_API_BASE_URL` is not set. See `TROUBLESHOOTING.md` for help.
 
 ### 4️⃣ Update Backend CORS (2 minutes)
 
@@ -82,4 +85,20 @@ Or use online: https://randomkeygen.com/
 
 ## 🆘 Need Help?
 
-See `DEPLOYMENT.md` for detailed instructions and troubleshooting.
+- **"Cannot connect to server" error?** → **See `DEPLOYMENT_FIX.md` for quick fix!** ⚡
+- **Detailed troubleshooting?** → See `TROUBLESHOOTING.md`
+- **Full deployment guide?** → See `DEPLOYMENT.md`
+- **Environment variables not working?** → Make sure to **redeploy** after setting them!
+
+---
+
+## ⚠️ Common Issue: "Cannot connect to server"
+
+**If you see this error after deployment**, it means `VITE_API_BASE_URL` is not set.
+
+**Quick Fix** (2 minutes):
+1. Go to Vercel/Netlify → Settings → Environment Variables
+2. Add: `VITE_API_BASE_URL` = `https://your-backend.onrender.com`
+3. **Redeploy** your frontend
+
+**See `DEPLOYMENT_FIX.md` for step-by-step instructions!**

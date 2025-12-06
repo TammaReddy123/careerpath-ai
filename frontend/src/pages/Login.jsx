@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { api } from "../api";
+import { AlertCircle } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -32,7 +33,27 @@ export default function Login() {
         window.location.href = "/dashboard";
       }, 500);
     } catch (err) {
-      const errorMsg = err.response?.data?.msg || "Invalid email or password";
+      let errorMsg = "Invalid email or password";
+      
+      if (err.response) {
+        // Server responded with error status
+        errorMsg = err.response.data?.msg || `Server error: ${err.response.status}`;
+      } else if (err.request) {
+        // Request was made but no response received
+        const isProduction = import.meta.env.PROD;
+        if (isProduction) {
+          if (!api.isConfigured) {
+            errorMsg = "Backend URL not configured. Please contact support or check deployment settings.";
+          } else {
+            errorMsg = "Cannot connect to server. Please check your internet connection or try again later.";
+          }
+        } else {
+          errorMsg = "Cannot connect to server. Please make sure the backend is running on port 5000.";
+        }
+      } else {
+        errorMsg = err.message || errorMsg;
+      }
+      
       setMsg(errorMsg);
       setIsError(true);
     }

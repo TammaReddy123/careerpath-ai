@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { api } from "../api";
-import { User, Upload, X } from "lucide-react";
+import { User, Upload, X, AlertCircle } from "lucide-react";
 import { detectGenderFromName, detectGenderFromEmail, getAvatarUrl } from "../utils/genderDetection";
 
 export default function Register() {
@@ -107,7 +107,16 @@ export default function Register() {
         errorMsg = err.response.data?.msg || `Server error: ${err.response.status}`;
       } else if (err.request) {
         // Request was made but no response received
-        errorMsg = "Cannot connect to server. Please make sure the backend is running on port 5000.";
+        const isProduction = import.meta.env.PROD;
+        if (isProduction) {
+          if (!api.isConfigured) {
+            errorMsg = "Backend URL not configured. Please contact support or check deployment settings.";
+          } else {
+            errorMsg = "Cannot connect to server. Please check your internet connection or try again later.";
+          }
+        } else {
+          errorMsg = "Cannot connect to server. Please make sure the backend is running on port 5000.";
+        }
       } else {
         // Something else happened
         errorMsg = err.message || errorMsg;
