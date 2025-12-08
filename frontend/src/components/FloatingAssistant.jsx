@@ -11,15 +11,6 @@ export default function FloatingAssistant() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Robot voice function
-  const speak = (text) => {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.pitch = 0.7;   // robotic deep voice
-    utter.rate = 0.85;
-    utter.volume = 1;
-    window.speechSynthesis.speak(utter);
-  };
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -45,8 +36,6 @@ export default function FloatingAssistant() {
 
       const data = await res.json();
       const reply = data.reply;
-
-      speak(reply);
 
       setMessages([...newMsgs, { from: "bot", text: reply }]);
     } catch {
