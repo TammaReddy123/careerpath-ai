@@ -93,10 +93,8 @@ export default function Register() {
       setProfileImage(null);
       setProfileImagePreview(null);
       
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 2000);
+      // Redirect to login quickly after success
+      window.location.href = "/login";
     } catch (err) {
       console.error("Registration error:", err);
       
@@ -128,6 +126,19 @@ export default function Register() {
       setIsError(true);
     }
   };
+
+  // Warm up backend to reduce first-request lag
+  useEffect(() => {
+    const warmup = async () => {
+      if (!api.baseUrl) return;
+      try {
+        await fetch(`${api.baseUrl}/api/health`, { method: "GET", mode: "cors" });
+      } catch (e) {
+        console.warn("Warmup (register) failed:", e?.message || e);
+      }
+    };
+    warmup();
+  }, []);
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-[#1E293B] via-[#1A202C] to-[#0F172A] p-4">

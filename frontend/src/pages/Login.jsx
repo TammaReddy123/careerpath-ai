@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { api } from "../api";
 import { AlertCircle } from "lucide-react";
@@ -29,9 +29,7 @@ export default function Login() {
       setMsg("Login successful! ✅");
       setIsError(false);
       
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 500);
+      window.location.href = "/dashboard";
     } catch (err) {
       let errorMsg = "Invalid email or password";
       
@@ -58,6 +56,19 @@ export default function Login() {
       setIsError(true);
     }
   };
+
+  // Warm up backend to reduce first-request lag
+  useEffect(() => {
+    const warmup = async () => {
+      if (!api.baseUrl) return;
+      try {
+        await fetch(`${api.baseUrl}/api/health`, { method: "GET", mode: "cors" });
+      } catch (e) {
+        console.warn("Warmup (login) failed:", e?.message || e);
+      }
+    };
+    warmup();
+  }, []);
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-[#1E293B] via-[#1A202C] to-[#0F172A] p-4">
